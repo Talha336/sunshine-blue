@@ -19,10 +19,11 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   body {
-    @apply bg-white font-sans text-[18px] leading-[28px] font-normal text-[#1a1a1a] antialiased;
+    @apply overflow-x-hidden bg-white font-sans text-[18px] leading-[28px] font-normal text-[#1a1a1a] antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
