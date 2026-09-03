@@ -13,14 +13,53 @@ import { useInquiry } from '@/context/InquiryContext'
 export function WholesaleInquiryDialog() {
   const { open, setOpen } = useInquiry()
   const [submitted, setSubmitted] = useState(false)
+  const [isSending, setIsSending] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setOpen(false)
-    }, 2000)
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    const payload = Object.fromEntries(formData.entries())
+
+    console.log('Inquiry form submitting...', payload)
+
+    setIsSending(true)
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+          subject: 'New Wholesale Inquiry - Sunshine Blue',
+          from_name: 'Sunshine Blue Website',
+          ...payload,
+        }),
+      })
+
+      const result = await response.json()
+      console.log('Inquiry form Web3Forms response:', result)
+
+      if (response.ok && result.success) {
+        console.log('Inquiry form submitted perfectly.')
+        form.reset()
+        setSubmitted(true)
+        setTimeout(() => {
+          setSubmitted(false)
+          setOpen(false)
+        }, 2000)
+      } else {
+        console.error('Inquiry form failed to submit:', result)
+        alert('Something went wrong. Please try again.')
+      }
+    } catch (error) {
+      console.error('Inquiry form submit error:', error)
+      alert('Something went wrong. Please try again.')
+    } finally {
+      setIsSending(false)
+    }
   }
 
   return (
@@ -95,8 +134,8 @@ export function WholesaleInquiryDialog() {
                 className="flex w-full resize-none rounded-md border border-border bg-white px-4 py-2 text-sm transition-colors placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10"
               />
             </div>
-            <Button type="submit" className="w-full">
-              Submit inquiry
+            <Button type="submit" className="w-full" disabled={isSending}>
+              {isSending ? 'Submitting...' : 'Submit inquiry'}
             </Button>
           </form>
         )}
