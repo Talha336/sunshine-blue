@@ -37,7 +37,6 @@ export const exploreCategories = [
 
 export const values = [
   'Women owned',
-  'LGBTQI+ owned',
   'Eco-friendly',
   'Organic cotton',
   'Not on Amazon',
